@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import { theme } from '../styles/theme';
 
 const LoginPage = () => {
+  const [activeTab, setActiveTab] = useState('admin');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,7 +16,15 @@ const LoginPage = () => {
       const response = await api.post('/api/auth/token/', { username, password });
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      navigate('/');
+
+      if (activeTab === 'guardian') {
+        // Fetch guardian data
+        const guardianResponse = await api.get('/api/students/guardians/me/');
+        localStorage.setItem('guardian_data', JSON.stringify(guardianResponse.data));
+        navigate('/guardian/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       console.log(err);
       setError('Invalid credentials');
@@ -22,59 +32,120 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-2xl lg:text-3xl font-extrabold text-gray-900">
-            Pen Academy
-          </h2>
-          <p className="mt-2 text-center text-sm lg:text-base text-gray-600">
-            Sign in to your account
+    <div className="min-h-screen flex">
+      {/* Left side - Brand */}
+      <div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 text-white"
+        style={{ backgroundColor: theme.primary }}
+      >
+        <div className="text-center">
+          <h1 className="text-5xl font-bold mb-4 flex items-center justify-center gap-3">
+            🌟 Morning Angels
+          </h1>
+          <p className="text-xl mb-8 opacity-90">Nurturing Young Minds</p>
+          <div className="text-6xl mb-8">🌈📚✨</div>
+          <p className="text-lg opacity-80">
+            Welcome to our vibrant learning community
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+      </div>
+
+      {/* Right side - Login form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8" style={{ backgroundColor: theme.white }}>
+        <div className="w-full max-w-md">
+          {/* Mobile header */}
+          <div className="lg:hidden text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2" style={{ color: theme.primary }}>
+              🌟 Morning Angels
+            </h1>
+            <p className="text-lg" style={{ color: theme.gray600 }}>
+              Nurturing Young Minds
+            </p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex mb-8 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('admin')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors duration-200 ${
+                activeTab === 'admin' ? 'text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+              style={{
+                backgroundColor: activeTab === 'admin' ? theme.primary : 'transparent'
+              }}
+            >
+              Admin
+            </button>
+            <button
+              onClick={() => setActiveTab('guardian')}
+              className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors duration-200 ${
+                activeTab === 'guardian' ? 'text-white' : 'text-gray-600 hover:text-gray-900'
+              }`}
+              style={{
+                backgroundColor: activeTab === 'guardian' ? theme.primary : 'transparent'
+              }}
+            >
+              Guardian
+            </button>
+          </div>
+
+          {/* Form */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="username" className="sr-only">Username</label>
+              <label htmlFor="username" className="block text-sm font-medium mb-2" style={{ color: theme.gray900 }}>
+                Username
+              </label>
               <input
                 id="username"
                 name="username"
                 type="text"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-colors duration-200"
+                style={{
+                  focusRingColor: theme.primary,
+                  borderColor: theme.gray100
+                }}
+                placeholder="Enter your username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: theme.gray900 }}>
+                Password
+              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-colors duration-200"
+                style={{
+                  focusRingColor: theme.primary,
+                  borderColor: theme.gray100
+                }}
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-          </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
+            {error && (
+              <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg">
+                {error}
+              </div>
+            )}
 
-          <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full py-3 px-4 rounded-lg font-medium text-white transition-colors duration-200 hover:opacity-90"
+              style={{ backgroundColor: theme.accent }}
             >
-              Sign in
+              Sign In
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

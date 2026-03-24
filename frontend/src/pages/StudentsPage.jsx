@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getStudents, createStudent, updateStudent, deleteStudent } from '../api/students';
+import { theme } from '../styles/theme';
 
 const StudentsPage = () => {
   const [students, setStudents] = useState([]);
@@ -122,7 +123,8 @@ const StudentsPage = () => {
           <h1 className="text-3xl font-bold text-gray-900">Students</h1>
           <button
             onClick={handleAdd}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+            className="text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-sm hover:opacity-90"
+            style={{ backgroundColor: theme.primary }}
           >
             Add Student
           </button>
@@ -319,7 +321,8 @@ const StudentsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 lg:px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                  className="px-3 lg:px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 hover:opacity-90"
+                  style={{ backgroundColor: theme.primary }}
                 >
                   {isEditing ? 'Update Student' : 'Add Student'}
                 </button>

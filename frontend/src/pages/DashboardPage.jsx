@@ -3,6 +3,7 @@ import { getStudents } from '../api/students';
 import { getFeePayments } from '../api/fees';
 import { getAttendance, getSubjects } from '../api/attendance';
 import { getNotifications } from '../api/notifications';
+import { theme } from '../styles/theme';
 
 const DashboardPage = () => {
   const [students, setStudents] = useState([]);
@@ -106,7 +107,7 @@ const DashboardPage = () => {
         labels: ['Present', 'Absent', 'Late'],
         datasets: [{
           data: [statusCounts.present, statusCounts.absent, statusCounts.late],
-          backgroundColor: ['#4CAF50', '#F44336', '#FF9800'],
+          backgroundColor: [theme.primary, '#DC2626', theme.accent],
           borderWidth: 1
         }]
       },
@@ -158,12 +159,12 @@ const DashboardPage = () => {
     });
 
   return (
-    <div className="p-6">
+    <div className="p-6 w-full max-w-full overflow-hidden">
       <h1 className="text-3xl font-bold mb-6">Welcome back, {username}</h1>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-blue-500 text-white p-8 rounded-lg shadow-md">
+        <div className="text-white p-8 rounded-lg shadow-md min-w-0" style={{ backgroundColor: theme.primary }}>
           <div className="flex flex-col items-center text-center">
             <div className="text-4xl mb-2">👥</div>
             <div>
@@ -172,7 +173,7 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-        <div className="bg-green-500 text-white p-8 rounded-lg shadow-md">
+        <div className="text-white p-8 rounded-lg shadow-md min-w-0" style={{ backgroundColor: theme.accent }}>
           <div className="flex flex-col items-center text-center">
             <div className="text-4xl mb-2">💰</div>
             <div>
@@ -181,7 +182,7 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-        <div className="bg-purple-500 text-white p-8 rounded-lg shadow-md">
+        <div className="text-white p-8 rounded-lg shadow-md min-w-0" style={{ backgroundColor: theme.primary }}>
           <div className="flex flex-col items-center text-center">
             <div className="text-4xl mb-2">📊</div>
             <div>
@@ -190,7 +191,7 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-        <div className="bg-orange-500 text-white p-8 rounded-lg shadow-md">
+        <div className="text-white p-8 rounded-lg shadow-md min-w-0" style={{ backgroundColor: theme.accent }}>
           <div className="flex flex-col items-center text-center">
             <div className="text-4xl mb-2">📢</div>
             <div>
@@ -221,13 +222,13 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md">
           <h3 className="text-lg lg:text-xl font-semibold mb-4">Recent Fee Payments</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[400px]">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[320px] sm:min-w-[400px]">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 text-sm lg:text-base">Student Name</th>
-                  <th className="text-left py-2 text-sm lg:text-base">Amount (USD)</th>
-                  <th className="text-left py-2 text-sm lg:text-base">Date Paid</th>
+                <tr style={{ backgroundColor: theme.primaryLight }}>
+                  <th className="text-left py-2 text-sm lg:text-base font-semibold" style={{ color: theme.gray900 }}>Student Name</th>
+                  <th className="text-left py-2 text-sm lg:text-base font-semibold" style={{ color: theme.gray900 }}>Amount (USD)</th>
+                  <th className="text-left py-2 text-sm lg:text-base font-semibold" style={{ color: theme.gray900 }}>Date Paid</th>
                 </tr>
               </thead>
               <tbody>
@@ -244,13 +245,13 @@ const DashboardPage = () => {
         </div>
         <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md">
           <h3 className="text-lg lg:text-xl font-semibold mb-4">Recent Absences Today</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[400px]">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[320px] sm:min-w-[400px]">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 text-sm lg:text-base">Student Name</th>
-                  <th className="text-left py-2 text-sm lg:text-base">Subject</th>
-                  <th className="text-left py-2 text-sm lg:text-base">Date</th>
+                <tr style={{ backgroundColor: theme.primaryLight }}>
+                  <th className="text-left py-2 text-sm lg:text-base font-semibold" style={{ color: theme.gray900 }}>Student Name</th>
+                  <th className="text-left py-2 text-sm lg:text-base font-semibold" style={{ color: theme.gray900 }}>Subject</th>
+                  <th className="text-left py-2 text-sm lg:text-base font-semibold" style={{ color: theme.gray900 }}>Status</th>
                 </tr>
               </thead>
               <tbody>
