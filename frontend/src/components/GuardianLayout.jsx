@@ -45,7 +45,7 @@ const GuardianLayout = ({ children }) => {
   }
 
   return (
-    <div className="h-screen overflow-hidden" style={{ backgroundColor: theme.gray50 }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: theme.gray50 }}>
       {/* Top navbar */}
       <header
         className="flex-shrink-0 shadow-sm p-4 border-b-2"

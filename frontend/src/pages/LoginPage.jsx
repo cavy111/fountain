@@ -8,10 +8,14 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+    
     try {
       const response = await api.post('/api/auth/token/', { username, password });
       localStorage.setItem('access_token', response.data.access);
@@ -28,6 +32,8 @@ const LoginPage = () => {
     } catch (err) {
       console.log(err);
       setError('Invalid credentials');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,7 +106,8 @@ const LoginPage = () => {
                 name="username"
                 type="text"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-colors duration-200"
+                disabled={loading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-colors duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 style={{
                   focusRingColor: theme.primary,
                   borderColor: theme.gray100
@@ -120,7 +127,8 @@ const LoginPage = () => {
                 name="password"
                 type="password"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-colors duration-200"
+                disabled={loading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-colors duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 style={{
                   focusRingColor: theme.primary,
                   borderColor: theme.gray100
@@ -139,10 +147,18 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg font-medium text-white transition-colors duration-200 hover:opacity-90"
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-lg font-medium text-white transition-colors duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               style={{ backgroundColor: theme.accent }}
             >
-              Sign In
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </button>
           </form>
         </div>

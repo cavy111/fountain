@@ -9,6 +9,8 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
+    subject = SubjectSerializer(read_only=True)
+    
     class Meta:
         model = Attendance
         fields = '__all__'

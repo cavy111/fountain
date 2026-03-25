@@ -24,6 +24,15 @@ class GuardianViewSet(viewsets.ModelViewSet):
     serializer_class = GuardianSerializer
 
     @action(detail=False, methods=['get'])
+    def me(self, request):
+        try:
+            guardian = Guardian.objects.get(user=request.user)
+            serializer = GuardianSerializer(guardian)
+            return Response(serializer.data)
+        except Guardian.DoesNotExist:
+            return Response({'error': 'Guardian not found'}, status=404)
+
+    @action(detail=False, methods=['get'])
     def my_children(self, request):
         guardian = Guardian.objects.get(user=request.user)
         students = guardian.students.all()
