@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getFeePayments, createFeePayment, deleteFeePayment, getStudents } from '../api/fees';
+import HorizontalScrollSync from '../components/HorizontalScrollSync';
+import { ViewButton, EditButton, DeleteButton, AddButton } from '../components/TableButton';
 
 const termOptions = ['Term 1', 'Term 2', 'Term 3'];
 
@@ -108,36 +110,36 @@ const FeesPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-5 rounded-xl bg-emerald-50 border border-emerald-200 shadow-sm">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="p-4 md:p-5 rounded-xl bg-emerald-50 border border-emerald-200 shadow-sm">
           <h3 className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Total Collected (USD)</h3>
-          <p className="mt-2 text-3xl font-bold text-emerald-800">${totalCollected.toFixed(2)}</p>
+          <p className="mt-2 text-2xl md:text-3xl font-bold text-emerald-800">${totalCollected.toFixed(2)}</p>
         </div>
-        <div className="p-5 rounded-xl bg-red-50 border border-red-200 shadow-sm">
+        <div className="p-4 md:p-5 rounded-xl bg-red-50 border border-red-200 shadow-sm">
           <h3 className="text-xs font-semibold text-red-700 uppercase tracking-wider">Total Outstanding (USD)</h3>
-          <p className="mt-2 text-3xl font-bold text-red-800">${totalOutstanding.toFixed(2)}</p>
+          <p className="mt-2 text-2xl md:text-3xl font-bold text-red-800">${totalOutstanding.toFixed(2)}</p>
         </div>
-        <div className="p-5 rounded-xl bg-orange-50 border border-orange-200 shadow-sm">
+        <div className="p-4 md:p-5 rounded-xl bg-orange-50 border border-orange-200 shadow-sm">
           <h3 className="text-xs font-semibold text-orange-700 uppercase tracking-wider">Number of Defaulters</h3>
-          <p className="mt-2 text-3xl font-bold text-orange-800">{defaultersCount}</p>
+          <p className="mt-2 text-2xl md:text-3xl font-bold text-orange-800">{defaultersCount}</p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex-1">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by student name or receipt #"
-            className="w-full md:w-96 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="flex gap-2 flex-wrap">
+      {/* Filters and Search */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by student name or receipt #"
+          className="w-full md:w-96 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base min-h-[40px]"
+        />
+        <div className="flex flex-col sm:flex-row gap-2 items-center flex-shrink-0">
           <select
             value={termFilter}
             onChange={(e) => setTermFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base min-h-[40px]"
           >
             <option value="">All Terms</option>
             {termOptions.map((t) => (
@@ -147,73 +149,69 @@ const FeesPage = () => {
           <select
             value={yearFilter}
             onChange={(e) => setYearFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base min-h-[40px]"
           >
             <option value="">All Years</option>
-            {uniqueAcademicYears.map((year) => (
+            {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((year) => (
               <option key={year} value={year}>{year}</option>
             ))}
           </select>
-          <button
-            onClick={openModal}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Record Payment
-          </button>
+          <AddButton onClick={openModal} className="min-h-[40px]">
+            Add Payment
+          </AddButton>
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white border border-gray-200 rounded-lg shadow-sm">
-        <table className="min-w-max w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Receipt Number</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Student Name</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Reg Number</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">Amount (USD)</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">Amount (ZWL)</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Payment Method</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Term</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Academic Year</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Date Paid</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-500">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filtered.length === 0 ? (
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <HorizontalScrollSync containerId="feesTable">
+          <table className="min-w-max w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={10} className="px-4 py-6 text-center text-sm text-gray-500">
-                  No payments found.
-                </td>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Receipt Number</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Student Name</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Reg Number</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">Amount (USD)</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">Amount (ZWL)</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Payment Method</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Term</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Academic Year</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Date Paid</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-500">Actions</th>
               </tr>
-            ) : (filtered.map((payment) => {
-              const student = students.find((s) => s.id === payment.student);
-              return (
-                <tr key={payment.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-700">{payment.receipt_number}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{student ? `${student.first_name} ${student.last_name}` : 'Unknown'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{student?.reg_number ?? '-'}</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-700">${Number(payment.amount_usd).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-right text-sm text-gray-700">{Number(payment.amount_zwl).toFixed(2)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{payment.payment_method}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{payment.term}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{payment.academic_year}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{new Date(payment.paid_on).toLocaleDateString()}</td>
-                  <td className="px-4 py-3 text-center text-sm">
-                    <button
-                      onClick={() => handleDelete(payment.id)}
-                      className="px-2 py-1 text-white bg-red-600 rounded hover:bg-red-700 transition text-xs"
-                    >
-                      Delete
-                    </button>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="px-4 py-6 text-center text-sm text-gray-500">
+                    No payments found.
                   </td>
                 </tr>
-              );
-            }))}
-          </tbody>
-        </table>
+              ) : (filtered.map((payment) => {
+                const student = students.find((s) => s.id === payment.student);
+                return (
+                  <tr key={payment.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-gray-700">{payment.receipt_number}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{student ? `${student.first_name} ${student.last_name}` : 'Unknown'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{student?.reg_number ?? '-'}</td>
+                    <td className="px-4 py-3 text-right text-sm text-gray-700">${Number(payment.amount_usd).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-right text-sm text-gray-700">{Number(payment.amount_zwl).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{payment.payment_method}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{payment.term}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{payment.academic_year}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{new Date(payment.paid_on).toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-center text-sm">
+                      <DeleteButton onClick={() => handleDelete(payment.id)} />
+                    </td>
+                  </tr>
+                );
+              }))}
+            </tbody>
+          </table>
+        </HorizontalScrollSync>
       </div>
 
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-4xl rounded-xl bg-white shadow-xl overflow-hidden">

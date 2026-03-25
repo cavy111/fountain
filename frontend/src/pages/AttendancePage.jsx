@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getAttendance, createAttendance, deleteAttendance, getSubjects } from '../api/attendance';
 import { getStudents } from '../api/students';
+import HorizontalScrollSync from '../components/HorizontalScrollSync';
+import { ViewButton, EditButton, DeleteButton, AddButton } from '../components/TableButton';
 
 const statusClasses = {
   present: 'bg-green-100 text-green-800',
@@ -125,30 +127,32 @@ const AttendancePage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div className="p-4 rounded-lg bg-green-50 border border-green-200">
           <h3 className="text-xs font-semibold uppercase text-green-700">Present Today</h3>
-          <p className="mt-1 text-3xl font-bold text-green-800">{presentCount}</p>
+          <p className="mt-1 text-2xl md:text-3xl font-bold text-green-800">{presentCount}</p>
         </div>
         <div className="p-4 rounded-lg bg-red-50 border border-red-200">
           <h3 className="text-xs font-semibold uppercase text-red-700">Absent Today</h3>
-          <p className="mt-1 text-3xl font-bold text-red-800">{absentCount}</p>
+          <p className="mt-1 text-2xl md:text-3xl font-bold text-red-800">{absentCount}</p>
         </div>
         <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
           <h3 className="text-xs font-semibold uppercase text-amber-700">Attendance Rate</h3>
-          <p className="mt-1 text-3xl font-bold text-amber-800">{attendanceRate.toFixed(1)}%</p>
+          <p className="mt-1 text-2xl md:text-3xl font-bold text-amber-800">{attendanceRate.toFixed(1)}%</p>
         </div>
       </div>
 
-      <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
-        <div className="flex gap-3 flex-wrap">
+      {/* Filters */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 items-end flex-wrap">
           <div>
             <label className="block text-xs text-gray-600">Date</label>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base min-h-[40px]"
             />
           </div>
           <div>
@@ -156,7 +160,7 @@ const AttendancePage = () => {
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base min-h-[40px]"
             >
               <option value="">All Subjects</option>
               {subjects.map((subject) => (
@@ -166,75 +170,69 @@ const AttendancePage = () => {
               ))}
             </select>
           </div>
-          <div className="flex-1 min-w-[220px]">
-            <label className="block text-xs text-gray-600">Search by student</label>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Name or notes"
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
         </div>
-        <button
-          onClick={openModal}
-          className="self-start px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Mark Attendance
-        </button>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-base min-h-[40px]"
+          />
+          <AddButton onClick={openModal} className="min-h-[40px]">
+            Add Attendance
+          </AddButton>
+        </div>
       </div>
 
-      <div className="overflow-x-auto bg-white border border-gray-200 rounded-lg shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Student Name</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Reg Number</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Subject</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Notes</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-500">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-100">
-            {filteredRecords.length === 0 ? (
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <HorizontalScrollSync containerId="attendanceTable">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
-                  No attendance found.
-                </td>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Student</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Reg Number</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Subject</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Notes</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold uppercase text-gray-500">Actions</th>
               </tr>
-            ) : (
-              filteredRecords.map((rec) => {
-                const student = students.find((s) => s.id === rec.student);
-                const subject = subjects.find((s) => s.id === rec.subject);
-                return (
-                  <tr key={rec.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-700">{new Date(rec.date).toLocaleDateString()}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{student ? `${student.first_name} ${student.last_name}` : 'Unknown'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{student?.reg_number ?? '-'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{subject?.name ?? 'Unknown'}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusClasses[rec.status] ?? 'bg-gray-100 text-gray-700'}`}>
-                        {rec.status.charAt(0).toUpperCase() + rec.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{rec.notes || '-'}</td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => handleDelete(rec.id)}
-                        className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {filteredRecords.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
+                    No attendance found.
+                  </td>
+                </tr>
+              ) : (
+                filteredRecords.map((rec) => {
+                  const student = students.find((s) => s.id === rec.student);
+                  const subject = subjects.find((s) => s.id === rec.subject);
+                  return (
+                    <tr key={rec.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-700">{new Date(rec.date).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{student ? `${student.first_name} ${student.last_name}` : 'Unknown'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{student?.reg_number ?? '-'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{subject?.name ?? 'Unknown'}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusClasses[rec.status] ?? 'bg-gray-100 text-gray-700'}`}>
+                          {rec.status.charAt(0).toUpperCase() + rec.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{rec.notes || '-'}</td>
+                      <td className="px-4 py-3 text-center">
+                        <DeleteButton onClick={() => handleDelete(rec.id)} />
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </HorizontalScrollSync>
       </div>
 
       {showModal && (

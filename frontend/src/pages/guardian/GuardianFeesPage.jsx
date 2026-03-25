@@ -65,9 +65,9 @@ const GuardianFeesPage = () => {
     const totalPaid = fees.reduce((sum, fee) => sum + (parseFloat(fee.amount_usd) || 0), 0);
     const totalOutstanding = fees.reduce((sum, fee) => sum + (parseFloat(fee.balance_usd) || 0), 0);
     
-    const paidFees = fees.filter(fee => fee.date_paid);
+    const paidFees = fees.filter(fee => fee.paid_on);
     const lastPaymentDate = paidFees.length > 0 
-      ? new Date(Math.max(...paidFees.map(fee => new Date(fee.date_paid))))
+      ? new Date(Math.max(...paidFees.map(fee => new Date(fee.paid_on))))
       : null;
 
     return {
@@ -201,7 +201,7 @@ const GuardianFeesPage = () => {
                       {fee.academic_year || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {fee.date_paid ? new Date(fee.date_paid).toLocaleDateString() : 'N/A'}
+                      {fee.paid_on ? new Date(fee.paid_on).toLocaleDateString() : 'N/A'}
                     </td>
                   </tr>
                 ))}

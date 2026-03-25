@@ -6,6 +6,7 @@ const GuardianLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [guardianData, setGuardianData] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const data = localStorage.getItem('guardian_data');
@@ -53,16 +54,16 @@ const GuardianLayout = ({ children }) => {
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-6">
-              <h1 className="text-2xl font-bold flex items-center gap-2" style={{ color: theme.primary }}>
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2" style={{ color: theme.primary }}>
                 🌟 Morning Angels
               </h1>
-              <nav className="hidden md:flex space-x-6">
+              <nav className="hidden md:flex space-x-4 md:space-x-6">
                 {navItems.map((item) => (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                    className={`px-3 py-2 md:px-4 rounded-lg font-medium transition-colors duration-200 text-sm md:text-base min-h-[40px] flex items-center ${
                       location.pathname === item.path
                         ? 'text-white'
                         : 'text-gray-600 hover:text-gray-900'
@@ -76,48 +77,63 @@ const GuardianLayout = ({ children }) => {
                 ))}
               </nav>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm" style={{ color: theme.gray600 }}>
+            <div className="flex items-center gap-2 md:gap-4">
+              <span className="hidden sm:block text-xs md:text-sm" style={{ color: theme.gray600 }}>
                 Welcome, {guardianData.first_name} {guardianData.last_name}
               </span>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:opacity-80"
+                className="px-3 py-2 md:px-4 rounded-lg font-medium transition-colors duration-200 hover:opacity-80 min-h-[40px] text-sm md:text-base"
                 style={{ backgroundColor: theme.accent, color: theme.white }}
               >
                 Logout
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Mobile navigation */}
-        <nav className="md:hidden mt-4 flex flex-wrap gap-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`px-3 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 ${
-                location.pathname === item.path
-                  ? 'text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-              style={{
-                backgroundColor: location.pathname === item.path ? theme.primary : 'transparent'
-              }}
+          {/* Mobile navigation */}
+          <div className="md:hidden mt-4">
+            {/* Hamburger menu button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 min-h-[40px] text-sm font-medium"
             >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+              <span className="text-xl">{mobileMenuOpen ? '✕' : '☰'}</span>
+              {mobileMenuOpen ? 'Close Menu' : 'Menu'}
+            </button>
+            
+            {/* Mobile dropdown menu */}
+            {mobileMenuOpen && (
+              <nav className="mt-4 space-y-2">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-3 py-2 rounded-lg font-medium transition-colors duration-200 text-sm min-h-[40px] ${
+                      location.pathname === item.path
+                        ? 'text-white'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                    style={{
+                      backgroundColor: location.pathname === item.path ? theme.primary : 'transparent'
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            )}
+          </div>
+        </div>
       </header>
 
       {/* Page content */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="mb-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+          <div className="mb-4 md:mb-6">
             <h2
-              className="text-2xl font-semibold"
+              className="text-xl md:text-2xl font-semibold"
               style={{ color: theme.gray900 }}
             >
               {getPageName()}

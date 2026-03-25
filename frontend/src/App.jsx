@@ -6,6 +6,7 @@ import GuardianLayout from './components/GuardianLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import StudentsPage from './pages/StudentsPage';
+import StudentProfilePage from './pages/StudentProfilePage';
 import FeesPage from './pages/FeesPage';
 import AttendancePage from './pages/AttendancePage';
 import ResultsPage from './pages/ResultsPage';
@@ -36,6 +37,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <StudentsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <StudentProfilePage />
               </Layout>
             </ProtectedRoute>
           }

@@ -13,8 +13,6 @@ const GuardianResultsPage = () => {
 
   useEffect(() => {
     fetchChildren();
-    // Set default to 2024 to match seeded data
-    setSelectedYear('2024');
   }, []);
 
   useEffect(() => {
@@ -49,6 +47,14 @@ const GuardianResultsPage = () => {
       console.log('Raw results response:', response.data);
       const childResults = response.data.filter(result => result.student === childId);
       console.log('Filtered results for child', childId, ':', childResults);
+      
+      // Debug: Log first result structure
+      if (childResults.length > 0) {
+        console.log('First result structure:', childResults[0]);
+        console.log('Subject field:', childResults[0].subject);
+        console.log('Academic year field:', childResults[0].academic_year, 'type:', typeof childResults[0].academic_year);
+      }
+      
       setResultsData(prev => ({ ...prev, [childId]: childResults }));
     } catch (err) {
       setError('Failed to fetch results data');
@@ -66,7 +72,7 @@ const GuardianResultsPage = () => {
 
   const getAvailableYears = () => {
     if (!selectedChild || !resultsData[selectedChild]) return [];
-    const years = [...new Set(resultsData[selectedChild].map(result => result.academic_year).filter(Boolean))];
+    const years = [...new Set(resultsData[selectedChild].map(result => String(result.academic_year)).filter(Boolean))];
     return years.sort();
   };
 
@@ -92,7 +98,7 @@ const GuardianResultsPage = () => {
       console.log('After term filter:', results);
     }
     if (selectedYear) {
-      results = results.filter(result => result.academic_year == selectedYear);
+      results = results.filter(result => String(result.academic_year) === String(selectedYear));
       console.log('After year filter:', results);
     }
 
@@ -130,7 +136,7 @@ const GuardianResultsPage = () => {
       results = results.filter(result => result.term === selectedTerm);
     }
     if (selectedYear) {
-      results = results.filter(result => result.academic_year === selectedYear);
+      results = results.filter(result => String(result.academic_year) === String(selectedYear));
     }
 
     return results.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -227,7 +233,7 @@ const GuardianResultsPage = () => {
             <button
               onClick={() => {
                 setSelectedTerm('');
-                setSelectedYear(new Date().getFullYear().toString());
+                setSelectedYear('');
               }}
               className="px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:opacity-80"
               style={{ backgroundColor: theme.primary, color: theme.white }}
@@ -274,22 +280,25 @@ const GuardianResultsPage = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Subject
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Mark
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Grade
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Class Position
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Term
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-0">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Academic Year
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Teacher Comment
                   </th>
                 </tr>
@@ -297,8 +306,13 @@ const GuardianResultsPage = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredResults.map((result, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {result.subject?.name || 'N/A'}
+                    <td className="px-6 py-4 text-left text-sm text-gray-900">
+                      {(() => {
+                        if (!result.subject) return 'N/A';
+                        if (typeof result.subject === 'string') return result.subject;
+                        if (typeof result.subject === 'object' && result.subject.name) return result.subject.name;
+                        return JSON.stringify(result.subject);
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {parseFloat(result.mark || 0)}%
@@ -313,6 +327,9 @@ const GuardianResultsPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {result.term || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {result.academic_year || 'N/A'}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                       {result.teacher_comment || '-'}

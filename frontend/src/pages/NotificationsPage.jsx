@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getNotifications, sendFeeReminders, sendAbsenceAlerts, sendBulkMessage } from '../api/notifications';
+import HorizontalScrollSync from '../components/HorizontalScrollSync';
+import { AddButton } from '../components/TableButton';
+import { theme } from '../styles/theme';
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -110,27 +113,30 @@ const NotificationsPage = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">Notifications</h1>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <div className="mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-3">Notifications</h1>
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={handleSendFeeReminders}
             disabled={actionLoading}
-            className="px-3 lg:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm lg:text-base"
+            className="whitespace-nowrap px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors"
+            style={{ backgroundColor: theme.primary }}
           >
             {actionLoading ? 'Sending...' : 'Send Fee Reminders'}
           </button>
           <button
             onClick={handleSendAbsenceAlerts}
             disabled={actionLoading}
-            className="px-3 lg:px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 text-sm lg:text-base"
+            className="whitespace-nowrap px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors"
+            style={{ backgroundColor: theme.accent }}
           >
             {actionLoading ? 'Sending...' : 'Send Absence Alerts'}
           </button>
           <button
             onClick={() => setShowBulkModal(true)}
             disabled={actionLoading}
-            className="px-3 lg:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm lg:text-base"
+            className="whitespace-nowrap px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-colors"
+            style={{ backgroundColor: theme.primary }}
           >
             Send Bulk Message
           </button>
@@ -138,36 +144,43 @@ const NotificationsPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-4">
-        <input
-          type="text"
-          placeholder="Search notifications..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="">All Types</option>
-          <option value="fee_reminder">Fee Reminders</option>
-          <option value="absence_alert">Absence Alerts</option>
-          <option value="announcement">Announcements</option>
-        </select>
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between mb-4">
+        <div className="flex gap-2 items-end flex-wrap">
+          <div>
+            <label className="block text-xs text-gray-600">Search</label>
+            <input
+              type="text"
+              placeholder="Search notifications..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600">Type</label>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Types</option>
+              <option value="fee_reminder">Fee Reminders</option>
+              <option value="absence_alert">Absence Alerts</option>
+              <option value="announcement">Announcements</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Notifications Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading notifications...</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+      {loading ? (
+        <div className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading notifications...</p>
+        </div>
+      ) : (
+        <HorizontalScrollSync containerId="notificationsTable">
+          <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -238,9 +251,8 @@ const NotificationsPage = () => {
                 )}
               </tbody>
             </table>
-          </div>
-        )}
-      </div>
+        </HorizontalScrollSync>
+      )}
 
       {/* Bulk Message Modal */}
       {showBulkModal && (
