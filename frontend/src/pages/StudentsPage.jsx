@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { getStudents, createStudent, updateStudent, deleteStudent } from '../api/students';
 import { theme } from '../styles/theme';
 import HorizontalScrollSync from '../components/HorizontalScrollSync';
@@ -193,47 +194,40 @@ const StudentsPage = () => {
       </div>
 
       {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            {/* Background overlay */}
-            <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={closeModal}></div>
-
-            {/* Modal panel */}
-            <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <form onSubmit={handleSubmit}>
-                <div className="bg-white px-4 py-5 sm:p-6 sm:pb-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-medium text-gray-900 leading-6">
-                      {isEditing ? 'Edit Student' : 'Add New Student'}
-                    </h3>
+      {showModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-2xl max-h-[85vh] bg-white rounded-xl shadow-xl flex flex-col">
+            <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {isEditing ? 'Edit Student' : 'Add New Student'}
+              </h3>
+            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                    <input
+                      type="text"
+                      name="first_name"
+                      value={formData.first_name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                      required
+                    />
                   </div>
-                  
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                      <input
-                        type="text"
-                        name="first_name"
-                        value={formData.first_name}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                      <input
-                        type="text"
-                        name="last_name"
-                        value={formData.last_name}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
-                        required
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                    <input
+                      type="text"
+                      name="last_name"
+                      value={formData.last_name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                      required
+                    />
                   </div>
-                  <div className="mt-4">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
                     <input
                       type="text"
@@ -244,61 +238,55 @@ const StudentsPage = () => {
                       required
                     />
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Form</label>
-                      <select
-                        name="form"
-                        value={formData.form}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
-                        required
-                      >
-                        <option value="">Select Form</option>
-                        <option value="Form 1">Form 1</option>
-                        <option value="Form 2">Form 2</option>
-                        <option value="Form 3">Form 3</option>
-                        <option value="Form 4">Form 4</option>
-                        <option value="Form 5">Form 5</option>
-                        <option value="Form 6">Form 6</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Stream</label>
-                      <input
-                        type="text"
-                        name="stream"
-                        value={formData.stream}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Form</label>
+                    <select
+                      name="form"
+                      value={formData.form}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                      required
+                    >
+                      <option value="">Select Form</option>
+                      <option value="Form 1">Form 1</option>
+                      <option value="Form 2">Form 2</option>
+                      <option value="Form 3">Form 3</option>
+                      <option value="Form 4">Form 4</option>
+                    </select>
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Guardian Name</label>
-                      <input
-                        type="text"
-                        name="guardian_name"
-                        value={formData.guardian_name}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Guardian Phone</label>
-                      <input
-                        type="tel"
-                        name="guardian_phone"
-                        value={formData.guardian_phone}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
-                        required
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Stream</label>
+                    <input
+                      type="text"
+                      name="stream"
+                      value={formData.stream}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                    />
                   </div>
-                  <div className="mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Guardian Name</label>
+                    <input
+                      type="text"
+                      name="guardian_name"
+                      value={formData.guardian_name}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Guardian Phone</label>
+                    <input
+                      type="tel"
+                      name="guardian_phone"
+                      value={formData.guardian_phone}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                      required
+                    />
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                     <input
                       type="date"
@@ -309,27 +297,50 @@ const StudentsPage = () => {
                       required
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Enrolled On</label>
+                    <input
+                      type="date"
+                      name="enrolled_on"
+                      value={formData.enrolled_on}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm min-h-[40px]"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        name="is_active"
+                        checked={formData.is_active}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <span className="ml-2 text-sm font-medium text-gray-700">Active Student</span>
+                    </label>
+                  </div>
                 </div>
-                <div className="px-4 py-3 bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 hover:opacity-90 min-h-[40px]"
-                    style={{ backgroundColor: theme.primary }}
-                  >
-                    {isEditing ? 'Update Student' : 'Add Student'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="mt-3 sm:mt-0 sm:mr-3 w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 min-h-[40px]"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
+              </div>
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row-reverse gap-2 flex-shrink-0">
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200 hover:opacity-90 min-h-[40px]"
+                  style={{ backgroundColor: theme.primary }}
+                >
+                  {isEditing ? 'Update Student' : 'Add Student'}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="mt-3 sm:mt-0 sm:mr-3 w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 min-h-[40px]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
