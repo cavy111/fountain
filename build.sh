@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -o errexit
+pip install -r requirements.txt
+python manage.py collectstatic --no-input
+python manage.py migrate
+python manage.py create_default_superuser
+python manage.py create_test_guardian
+python manage.py seed_guardian_demo_data
