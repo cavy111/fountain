@@ -48,7 +48,7 @@ def class_position_for_subject(entries):
 
 
 class Command(BaseCommand):
-    help = 'Seed demo data for Morning Angels Primary School guardian pages'
+    help = 'Seed demo data for Fountain Primary School guardian pages'
 
     def handle(self, *args, **options):
         if (
@@ -62,7 +62,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('Demo data already exists; skipping seeding.'))
             return
 
-        self.stdout.write(self.style.SUCCESS('Seeding Morning Angels demo data...'))
+        self.stdout.write(self.style.SUCCESS('Seeding Fountain demo data...'))
 
         # Create classes for primary school
         class_names = ['Grade 1A', 'Grade 2A', 'Grade 3A', 'Grade 4A', 'Grade 5A', 'Grade 6A', 'Grade 7A']
@@ -130,7 +130,7 @@ class Command(BaseCommand):
 
         for idx, (first, last, guardian, phone) in enumerate(primary_students, start=1):
             grade = grades[(idx - 1) // 3]  # 3 students per grade
-            reg = f'ANG{idx:03d}/2024'
+            reg = f'FOU{idx:03d}/2024'
             dob = date(2017 - ((idx - 1) % 7), random.randint(1, 12), random.randint(1, 28))
             student, _ = Student.objects.get_or_create(
                 reg_number=reg,
@@ -240,7 +240,7 @@ class Command(BaseCommand):
 
         # Link first 2 students to the test guardian (if guardian exists)
         try:
-            guardian_user = User.objects.get(username='guardian@morningangels.co.zw')
+            guardian_user = User.objects.get(username='guardian@fountain.co.zw')
             guardian = Guardian.objects.get(user=guardian_user)
             first_two_students = students[:2]
             guardian.students.add(*first_two_students)
@@ -248,4 +248,4 @@ class Command(BaseCommand):
         except (User.DoesNotExist, Guardian.DoesNotExist):
             self.stdout.write(self.style.WARNING('Test guardian not found. Run create_test_guardian first.'))
 
-        self.stdout.write(self.style.SUCCESS('Morning Angels demo data seeding complete!'))
+        self.stdout.write(self.style.SUCCESS('Fountain demo data seeding complete!'))

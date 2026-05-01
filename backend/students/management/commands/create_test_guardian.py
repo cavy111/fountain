@@ -8,9 +8,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Guardian details
-        username = 'guardian@morningangels.co.zw'
+        username = 'guardian@fountain.co.zw'
         password = 'guardian123'
-        email = 'guardian@morningangels.co.zw'
+        email = 'guardian@fountain.co.zw'
         first_name = 'Sarah'
         last_name = 'Moyo'
         phone = '0771234567'
