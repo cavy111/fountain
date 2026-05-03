@@ -1,6 +1,13 @@
 services:
+  # PostgreSQL Database
+  - type: pserv
+    name: fountain-db
+    runtime: postgresql
+    plan: free
+    
+  # Django Backend
   - type: web
-    name: pen-academy-backend
+    name: fountain-backend
     runtime: python
     rootDir: backend
     buildCommand: ./build.sh
@@ -12,18 +19,34 @@ services:
         generateValue: true
       - key: DATABASE_URL
         fromDatabase:
-          name: pen-academy-db
+          name: fountain-db
           property: connectionString
       - key: ALLOWED_HOSTS
-        value: your-render-url.onrender.com
+        value: fountain-backend.onrender.com
       - key: CORS_ALLOWED_ORIGINS
-        value: https://your-netlify-url.netlify.app
+        value: https://fountain-frontend.onrender.com
       - key: WHATSAPP_TOKEN
         sync: false
       - key: WHATSAPP_PHONE_ID
         sync: false
       - key: WHATSAPP_VERSION
         value: v19.0
+        
+  # React Frontend
+  - type: web
+    name: fountain-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://PLACEHOLDER_REPLACE_AFTER_DEPLOY.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
 databases:
-  - name: pen-academy-db
+  - name: fountain-db
     plan: free
